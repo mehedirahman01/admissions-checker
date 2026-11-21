@@ -7,7 +7,12 @@ authors = [
     { name = "Mehedi Rahman", email = "mehedii.rahman@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "alembic>=1.20.1",
+    "psycopg[binary]>=3.3.9",
+    "pydantic-settings>=2.16.3",
+    "sqlalchemy>=2.1.9",
+]
 
 
 
@@ -22,6 +27,7 @@ dev = [
 ]
 
 [tool.ruff]
+extend-exclude = ["migrations"]
 line-length = 100
 target-version = "py312"
 
