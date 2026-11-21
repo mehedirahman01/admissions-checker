@@ -177,6 +177,31 @@ class CrawlRun(Base):
     pages_failed: Mapped[int] = mapped_column(server_default="0")
 
 
+class Document(Base):
+    """One fetched URL (HTML page or PDF). The raw file lives on disk, named by its hash."""
+
+    __tablename__ = "document"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    university_id: Mapped[int] = mapped_column(
+        ForeignKey("university.id", ondelete="CASCADE"), index=True
+    )
+    url: Mapped[str] = mapped_column(String(2000), unique=True)
+    status_code: Mapped[int | None]
+    content_type: Mapped[str | None] = mapped_column(String(100))
+    content_hash: Mapped[str | None] = mapped_column(String(64), index=True)
+    storage_path: Mapped[str | None] = mapped_column(String(300))
+    error: Mapped[str | None] = mapped_column(Text)
+    first_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    last_fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    crawl_run_id: Mapped[int | None] = mapped_column(
+        ForeignKey("crawl_run.id", ondelete="SET NULL")
+    )
+
+
 class ChangeEvent(Base):
     __tablename__ = "change_event"
 
