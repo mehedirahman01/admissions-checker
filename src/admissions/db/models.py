@@ -49,13 +49,15 @@ class Timestamps:
 class University(Timestamps, Base):
     __tablename__ = "university"
     __table_args__ = (
-        CheckConstraint("type IN ('university', 'applied_sciences')", name="type"),
+        CheckConstraint("type IN ('university', 'applied_sciences', 'arts')", name="type"),
+        CheckConstraint("ownership IN ('public', 'private', 'church')", name="ownership"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(200), unique=True)
     city: Mapped[str] = mapped_column(String(100))
     type: Mapped[str] = mapped_column(String(20))
+    ownership: Mapped[str] = mapped_column(String(10), server_default="public")
     website: Mapped[str] = mapped_column(String(500))
     programs_page_url: Mapped[str | None] = mapped_column(String(500))
 
