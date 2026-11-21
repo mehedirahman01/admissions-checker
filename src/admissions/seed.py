@@ -10,6 +10,7 @@ from pathlib import Path
 
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import Session
 
 from admissions.db.models import University
 from admissions.db.session import SessionLocal
@@ -26,7 +27,7 @@ def load_rows(path: Path) -> list[dict]:
     return rows
 
 
-def seed_universities(rows: list[dict]) -> None:
+def seed_universities(session: Session, rows: list[dict]) -> None:
     stmt = insert(University).values(rows)
     # Upsert: if a university with this name exists, update it instead of failing.
     stmt = stmt.on_conflict_do_update(
@@ -40,13 +41,13 @@ def seed_universities(rows: list[dict]) -> None:
             "updated_at": func.now(),
         },
     )
-    with SessionLocal.begin() as session:
-        session.execute(stmt)
+    session.execute(stmt)
 
 
 def main() -> None:
     rows = load_rows(SEED_FILE)
-    seed_universities(rows)
+    with SessionLocal.begin() as session:
+        seed_universities(session, rows)
     with SessionLocal() as session:
         total = session.scalar(select(func.count()).select_from(University))
     print(f"Seeded {len(rows)} rows from {SEED_FILE.name}. Universities in database: {total}")
